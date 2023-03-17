@@ -15,7 +15,6 @@ type SampleStruct struct {
 }
 
 func fakeSetup() {
-
 	SetSQLiteConnectOpts(&SQLiteConnectOpts{
 		Path: path.Join(os.TempDir(), "egorm_test.sqlite"),
 	})
@@ -58,6 +57,42 @@ func TestInsert(t *testing.T) {
 			t.Error(err)
 			return
 		}
+	})
+}
+
+func TestGetWhere(t *testing.T) {
+	t.Run("TestGetWhere", func(t *testing.T) {
+		fakeSetup()
+
+		var samples []SampleStruct
+		err := DbGet(&samples, Where{"Name": "Sample2"})
+		if err != nil {
+			t.Error(err)
+			return
+		}
+
+		if len(samples) != 1 {
+			t.Error(fmt.Errorf("egorm: Expected %d items, got %d", 1, len(samples)))
+		}
+
+	})
+}
+
+func TestFirstWhere(t *testing.T) {
+	t.Run("TestGetWhere", func(t *testing.T) {
+		fakeSetup()
+
+		var samples SampleStruct
+		err := DbFirst(&samples, Where{"Name": "Sample2"})
+		if err != nil {
+			t.Error(err)
+			return
+		}
+
+		if samples.ID == 0 {
+			t.Error(fmt.Errorf("egorm: Expected %d items, got %d", 1, 0))
+		}
+
 	})
 }
 

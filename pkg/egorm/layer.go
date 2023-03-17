@@ -1,5 +1,7 @@
 package egorm
 
+type Where map[string]interface{}
+
 func DbGetAll[T any](input *[]T) error {
 
 	if err := InitDB(); err != nil {
@@ -33,7 +35,7 @@ func DbCreate[T any](input *T) error {
 	return nil
 }
 
-func DbGet[T any](input []T, where map[string]string) error {
+func DbGet[T any](input *[]T, where map[string]interface{}) error {
 	if err := InitDB(); err != nil {
 		return err
 	}
@@ -41,11 +43,16 @@ func DbGet[T any](input []T, where map[string]string) error {
 	err := autoMigrate(&tmp)
 	if err != nil {
 		return err
+	}
+
+	result := Db.Where(where).Find(input)
+	if result.Error != nil {
+		return result.Error
 	}
 	return nil
 }
 
-func DbFirst[T any](input *T, where map[string]string) error {
+func DbFirst[T any](input *T, where map[string]interface{}) error {
 	if err := InitDB(); err != nil {
 		return err
 	}
@@ -53,6 +60,11 @@ func DbFirst[T any](input *T, where map[string]string) error {
 	err := autoMigrate(&tmp)
 	if err != nil {
 		return err
+	}
+
+	result := Db.Where(where).First(input)
+	if result.Error != nil {
+		return result.Error
 	}
 	return nil
 }
@@ -66,5 +78,11 @@ func DbFind[T any](input *T, id int) error {
 	if err != nil {
 		return err
 	}
+
+	result := Db.Find(input, id)
+	if result.Error != nil {
+		return result.Error
+	}
+
 	return nil
 }
