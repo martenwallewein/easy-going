@@ -35,6 +35,21 @@ func DbCreate[T any](input *T) error {
 	return nil
 }
 
+func DbSave[T any](input *T) error {
+	if err := InitDB(); err != nil {
+		return err
+	}
+	err := autoMigrate(input)
+	if err != nil {
+		return err
+	}
+	result := Db.Save(input)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
 func DbGet[T any](input *[]T, where map[string]interface{}) error {
 	if err := InitDB(); err != nil {
 		return err

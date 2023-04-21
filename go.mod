@@ -4,6 +4,8 @@ go 1.18
 
 require (
 	github.com/glebarez/sqlite v1.7.0
+	github.com/kevinburke/ssh_config v1.2.0
+	golang.org/x/crypto v0.8.0
 	gorm.io/gorm v1.24.5
 )
 
@@ -15,7 +17,7 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230126093431-47fa9a501578 // indirect
-	golang.org/x/sys v0.4.0 // indirect
+	golang.org/x/sys v0.7.0 // indirect
 	modernc.org/libc v1.22.2 // indirect
 	modernc.org/mathutil v1.5.0 // indirect
 	modernc.org/memory v1.5.0 // indirect
