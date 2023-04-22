@@ -3,6 +3,7 @@
 In this example we show you how to implement encryption and signing (RSA and HMAC) in Go to send messages over the network in a secure way,
 through adding confidentiality and authentication. The following image depicts the idea:
 
+![gocrypt](https://user-images.githubusercontent.com/32448709/233780866-e13e14bc-c0d7-4957-877d-5a92dab6f063.jpg)
 
 
 Sender and receiver both have a keypair of private and public key that are known and trusted to both sides. At first, the sender encrypts the message using the receivers public key. Afterwards, the sender signs the message using its own private key and appends the signature to the encrypted message. Next, the sender sends the message including the signature over the network to the receiver. The receiver now splits the received data into the encrypted message and the signature. With its own private key, it can now decrypt the encrypted message, and using the public key of the sender, it can verify the signature. Please note that the same goal could be done by using symmetric cryptography. By combining these two approaches, we achieve the following:
