@@ -1,5 +1,11 @@
 package egorm
 
+import (
+	"errors"
+
+	"gorm.io/gorm"
+)
+
 type Where map[string]interface{}
 
 func DbGetAll[T any](input *[]T) error {
@@ -79,6 +85,11 @@ func DbFirst[T any](input *T, where map[string]interface{}) error {
 
 	result := Db.Where(where).First(input)
 	if result.Error != nil {
+		// Suppress error here, since it may be intended not to have an error here, input
+		// is then simply nil
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil
+		}
 		return result.Error
 	}
 	return nil

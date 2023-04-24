@@ -3,9 +3,11 @@ package egorm
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"sync"
 
 	"github.com/glebarez/sqlite"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
@@ -13,6 +15,51 @@ var Db *gorm.DB
 var initOnce sync.Once
 var initOnceErr error
 var sqliteOps *SQLiteConnectOpts
+var postgresOps *PostgresConnectOpts
+
+type PostgresConnectOpts struct {
+	Host     string
+	Port     int
+	Database string
+	User     string
+	Password string
+}
+
+func SetPostgresConnectOpts(ops *PostgresConnectOpts) {
+	postgresOps = ops
+}
+
+func setupPostgres() (*gorm.DB, error) {
+
+	if postgresOps == nil {
+		dbHost := os.Getenv("DB_HOST")
+		dbPort := os.Getenv("DB_PORT")
+		dbName := os.Getenv("DB_DATABASE")
+		dbUser := os.Getenv("DB_USER")
+		dbPassword := os.Getenv("DB_PASSWORD")
+		port, _ := strconv.Atoi(dbPort)
+		postgresOps = &PostgresConnectOpts{
+			Host:     dbHost,
+			Port:     port,
+			Database: dbName,
+			User:     dbUser,
+			Password: dbPassword,
+		}
+	}
+
+	connectionString := fmt.Sprintf("host=%s port=%d user=%s dbname=%s password=%s sslmode=disable",
+		postgresOps.Host,
+		postgresOps.Port,
+		postgresOps.User,
+		postgresOps.Database,
+		postgresOps.Password)
+
+	db, err := gorm.Open(postgres.Open(connectionString))
+	if err != nil {
+		return nil, err
+	}
+	return db, nil
+}
 
 type SQLiteConnectOpts struct {
 	Path string
@@ -53,11 +100,15 @@ func setupSQLite() (*gorm.DB, error) {
 
 func initializeDatabaseLayer() {
 
-	dbs := os.Getenv("DB")
+	dbs := os.Getenv("EGORM_DB")
 	var db *gorm.DB
 
-	if dbs == "" {
+	if dbs == "" || sqliteOps != nil {
 		dbs = "sqlite"
+	}
+
+	if postgresOps != nil {
+		dbs = "postgres"
 	}
 
 	// var err error
@@ -65,6 +116,9 @@ func initializeDatabaseLayer() {
 	switch dbs {
 	case "sqlite":
 		db, initOnceErr = setupSQLite()
+		break
+	case "postgres":
+		db, initOnceErr = setupPostgres()
 		break
 	default:
 		initOnceErr = fmt.Errorf("No database found, set the DB env")
