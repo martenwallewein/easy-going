@@ -32,11 +32,11 @@ func SetPostgresConnectOpts(ops *PostgresConnectOpts) {
 func setupPostgres() (*gorm.DB, error) {
 
 	if postgresOps == nil {
-		dbHost := os.Getenv("DB_HOST")
-		dbPort := os.Getenv("DB_PORT")
-		dbName := os.Getenv("DB_DATABASE")
-		dbUser := os.Getenv("DB_USER")
-		dbPassword := os.Getenv("DB_PASSWORD")
+		dbHost := os.Getenv("EGORM_POSTGRES_DB_HOST")
+		dbPort := os.Getenv("EGORM_POSTGRES_DB_PORT")
+		dbName := os.Getenv("EGORM_POSTGRES_DB_DATABASE")
+		dbUser := os.Getenv("EGORM_POSTGRES_DB_USER")
+		dbPassword := os.Getenv("EGORM_POSTGRES_DB_PASSWORD")
 		port, _ := strconv.Atoi(dbPort)
 		postgresOps = &PostgresConnectOpts{
 			Host:     dbHost,
@@ -72,7 +72,7 @@ func SetSQLiteConnectOpts(ops *SQLiteConnectOpts) {
 func setupSQLite() (*gorm.DB, error) {
 	var dbLocation string
 	if sqliteOps == nil || sqliteOps.Path == "" {
-		dbLocation = os.Getenv("DB_SQLITE_PATH")
+		dbLocation = os.Getenv("EGORM_DB_SQLITE_PATH")
 		if dbLocation == "" {
 			return nil, fmt.Errorf("egorm: sqliteOpts.Path not specified and DB_SQLITE_PATH env is empty")
 		}
